@@ -30,7 +30,7 @@ services:
 
   # ─── Services ────────────────────────────────────────────
   order-service:
-    image: order-service
+    image: aminebougui/order-service:latest
     environment:
       DB_URL: jdbc:postgresql://order-db:5432/orderdb
       DB_USER: postgres
@@ -42,7 +42,7 @@ services:
     restart: on-failure
 
   kitchen-service:
-    image: kitchen-service
+    image: aminebougui/kitchen-service:latest
     environment:
       DB_URL: jdbc:postgresql://kitchen-db:5432/kitchendb
       DB_USER: postgres
@@ -54,7 +54,7 @@ services:
     restart: on-failure
 
   accounting-service:
-    image: accounting-service
+    image: aminebougui/accounting-service:latest
     environment:
       DB_URL: jdbc:postgresql://accounting-db:5432/accountingdb
       DB_USER: postgres
@@ -66,7 +66,7 @@ services:
     restart: on-failure
 
   order-orchestrator:
-    image: order-orchestrator
+    image: aminebougui/order-orchestrator:latest
     environment:
       ORDER_SERVICE_HOST: order-service
       KITCHEN_SERVICE_HOST: kitchen-service
@@ -81,7 +81,7 @@ services:
 
   # ─── Frontend ────────────────────────────────────────────
   frontend:
-    image: frontend
+    image: aminebougui/frontend:latest
     ports:
       - "80:80"
     depends_on:
