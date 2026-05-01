@@ -1,0 +1,88 @@
+services:
+
+  # ─── Databases ───────────────────────────────────────────
+  order-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  kitchen-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: kitchendb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  accounting-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: accountingdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+
+  # ─── Services ────────────────────────────────────────────
+  order-service:
+    image: order-service
+    environment:
+      DB_URL: jdbc:postgresql://order-db:5432/orderdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "50051:50051"
+    depends_on:
+      - order-db
+    restart: on-failure
+
+  kitchen-service:
+    image: kitchen-service
+    environment:
+      DB_URL: jdbc:postgresql://kitchen-db:5432/kitchendb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "50052:50052"
+    depends_on:
+      - kitchen-db
+    restart: on-failure
+
+  accounting-service:
+    image: accounting-service
+    environment:
+      DB_URL: jdbc:postgresql://accounting-db:5432/accountingdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "50053:50053"
+    depends_on:
+      - accounting-db
+    restart: on-failure
+
+  order-orchestrator:
+    image: order-orchestrator
+    environment:
+      ORDER_SERVICE_HOST: order-service
+      KITCHEN_SERVICE_HOST: kitchen-service
+      ACCOUNTING_SERVICE_HOST: accounting-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - order-service
+      - kitchen-service
+      - accounting-service
+    restart: on-failure
+
+  # ─── Frontend ────────────────────────────────────────────
+  frontend:
+    image: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - order-orchestrator
